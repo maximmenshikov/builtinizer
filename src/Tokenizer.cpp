@@ -68,7 +68,7 @@ Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
         {
             char c2;
 
-            ss.peek();
+            c2 = ss.peek();
             if (c2 == 'J')
             {
                 /* Spoils next token */
