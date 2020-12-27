@@ -52,8 +52,8 @@ reconstructSignature(LibraryFunction *func)
         if (mode == 0 ||
             (newMode <= mode &&
             !(newMode == mode &&
-              cls == TokenClass::PreModifier ||
-              cls == TokenClass::PostModifier)))
+              (cls == TokenClass::PreModifier ||
+               cls == TokenClass::PostModifier))))
         {
             if (s != "")
                 types.push_back(s);
