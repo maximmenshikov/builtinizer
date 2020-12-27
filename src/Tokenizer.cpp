@@ -1,26 +1,28 @@
 #include "Tokenizer.hpp"
 
 std::string
-Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
+Tokenizer::getToken(std::stringstream &stringStream,
+                    TokenClass &       tokenClass,
+                    TokenPosition &    tokenPosition)
 {
     std::string s;
     char        c;
 
-    if (ss.eof() || ss.rdbuf()->in_avail() == 0)
+    if (stringStream.eof() || stringStream.rdbuf()->in_avail() == 0)
     {
-        cls = TokenClass::Unknown;
+        tokenClass = TokenClass::Unknown;
         return "";
     }
 
-    ss >> c;
+    stringStream >> c;
     if (c == '\0')
     {
-        cls = TokenClass::Unknown;
+        tokenClass = TokenClass::Unknown;
         return "";
     }
 
-    cls = TokenClass::Type;
-    tp = TokenPosition::Middle;
+    tokenClass = TokenClass::Type;
+    tokenPosition = TokenPosition::Middle;
     switch (c)
     {
         case 'v':
@@ -68,7 +70,7 @@ Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
         {
             char c2;
 
-            c2 = ss.peek();
+            c2 = stringStream.peek();
             if (c2 == 'J')
             {
                 /* Spoils next token */
@@ -91,8 +93,8 @@ Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
             break;
     }
 
-    cls = TokenClass::PreModifier;
-    tp = TokenPosition::Before;
+    tokenClass = TokenClass::PreModifier;
+    tokenPosition = TokenPosition::Before;
     switch (c)
     {
         case 'L':
@@ -103,12 +105,12 @@ Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
 
             while (true)
             {
-                int next = ss.peek();
+                int next = stringStream.peek();
 
                 if (next != 'L')
                     break;
 
-                ss >> c;
+                stringStream >> c;
                 s += c;
             }
 
@@ -143,13 +145,13 @@ Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
             return "unsigned";
         case 'I':
             /* check next */
-            return getToken(ss, cls, tp);
+            return getToken(stringStream, tokenClass, tokenPosition);
         default:
             break;
     }
 
-    cls = TokenClass::PostModifier;
-    tp = TokenPosition::After;
+    tokenClass = TokenClass::PostModifier;
+    tokenPosition = TokenPosition::After;
     switch (c)
     {
         case '*':
@@ -162,10 +164,10 @@ Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
          * Basically pre modifiers
          */
         case 'C':
-            tp = TokenPosition::Before;
+            tokenPosition = TokenPosition::Before;
             return "const";
         case 'D':
-            tp = TokenPosition::Before;
+            tokenPosition = TokenPosition::Before;
             return "volatile";
         default:
             break;
@@ -175,7 +177,7 @@ Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
 }
 
 std::string
-Tokenizer::fixupToken(const std::string &s)
+Tokenizer::fixupType(const std::string &s)
 {
     if (s == "long long double")
         return "__float128";

@@ -88,14 +88,13 @@ reconstructSignature(LibraryFunction *func)
     /* Rebuild signature */
     if (types.size() > 0)
     {
-        signature +=
-            Tokenizer::fixupToken(types[0]) + " " + func->getId() + "(";
+        signature += Tokenizer::fixupType(types[0]) + " " + func->getId() + "(";
 
         for (int i = 1; i < types.size(); ++i)
         {
             if (i != 1)
                 signature += ", ";
-            signature += Tokenizer::fixupToken(types[i]);
+            signature += Tokenizer::fixupType(types[i]);
         }
         signature += ");";
     }
