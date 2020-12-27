@@ -1,37 +1,38 @@
+#include <exception>
 #include <iostream>
 #include <sstream>
 #include <string>
-#include <exception>
 #include <vector>
 #include "BuiltinizerMode.hpp"
+#include "LibraryFunction.hpp"
 #include "TokenClass.hpp"
 #include "TokenPosition.hpp"
-#include "LibraryFunction.hpp"
 #include "Tokenizer.hpp"
 
 
 #define BUILTIN(ID, TYPE, ATTRS) LibraryFunction(#ID, TYPE, ATTRS),
 
 #if defined(BUILTIN) && !defined(LIBBUILTIN)
-#  define LIBBUILTIN(ID, TYPE, ATTRS, HEADER, BUILTIN_LANG) BUILTIN(ID, TYPE, ATTRS)
+#define LIBBUILTIN(ID, TYPE, ATTRS, HEADER, BUILTIN_LANG) \
+    BUILTIN(ID, TYPE, ATTRS)
 #endif
 
 #if defined(BUILTIN) && !defined(LANGBUILTIN)
-#  define LANGBUILTIN(ID, TYPE, ATTRS, BUILTIN_LANG) BUILTIN(ID, TYPE, ATTRS)
+#define LANGBUILTIN(ID, TYPE, ATTRS, BUILTIN_LANG) BUILTIN(ID, TYPE, ATTRS)
 #endif
 
 LibraryFunction funcs[] = {
-    #include "Builtins.def"
+#include "Builtins.def"
 };
 
 std::string
 reconstructSignature(LibraryFunction *func)
 {
-    std::string   signature;
-    int           mode = 0;
-    TokenClass    cls;
-    TokenPosition tp;
-    std::string   s;
+    std::string              signature;
+    int                      mode = 0;
+    TokenClass               cls;
+    TokenPosition            tp;
+    std::string              s;
     std::vector<std::string> types;
     std::stringstream        ss(func->getType());
 
@@ -51,9 +52,9 @@ reconstructSignature(LibraryFunction *func)
         newMode = (int)cls;
         if (mode == 0 ||
             (newMode <= mode &&
-            !(newMode == mode &&
-              (cls == TokenClass::PreModifier ||
-               cls == TokenClass::PostModifier))))
+             !(newMode == mode &&
+               (cls == TokenClass::PreModifier ||
+                cls == TokenClass::PostModifier))))
         {
             if (s != "")
                 types.push_back(s);
@@ -87,8 +88,8 @@ reconstructSignature(LibraryFunction *func)
     /* Rebuild signature */
     if (types.size() > 0)
     {
-        signature += Tokenizer::fixupToken(types[0]) + " " + func->getId() +
-            "(";
+        signature +=
+            Tokenizer::fixupToken(types[0]) + " " + func->getId() + "(";
 
         for (int i = 1; i < types.size(); ++i)
         {
@@ -101,12 +102,13 @@ reconstructSignature(LibraryFunction *func)
     return signature;
 }
 
-int main(int argc, const char *argv[])
+int
+main(int argc, const char *argv[])
 {
-    std::string s;
-    size_t      sigs = 0;
-    bool        ignoreHalf = false;
-    bool        constExpr = false;
+    std::string     s;
+    size_t          sigs = 0;
+    bool            ignoreHalf = false;
+    bool            constExpr = false;
     BuiltinizerMode mode = BuiltinizerMode::Signatures;
 
     for (int i = 1; i < argc; ++i)

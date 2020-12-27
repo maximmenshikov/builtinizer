@@ -4,7 +4,7 @@ std::string
 Tokenizer::getToken(std::stringstream &ss, TokenClass &cls, TokenPosition &tp)
 {
     std::string s;
-    char c;
+    char        c;
 
     if (ss.eof() || ss.rdbuf()->in_avail() == 0)
     {
