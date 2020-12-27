@@ -25,6 +25,14 @@ LibraryFunction funcs[] = {
 #include "Builtins.def"
 };
 
+
+/**
+ * Reconstruct signature from Clang's Builtin declaration
+ *
+ * @param      func  The library function pointer
+ *
+ * @return     String representation of function signature
+ */
 std::string
 reconstructSignature(LibraryFunction *func)
 {
