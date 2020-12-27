@@ -7,7 +7,7 @@ different form. Use at your own risk, PRs welcome if (when) you find issues.
 
 ## Build
 
-As always with cmake:
+Put Builtins.def from Clang to src folder. Then build with ``cmake`` as always:
 
 	mkdir -p build
 	cd build
