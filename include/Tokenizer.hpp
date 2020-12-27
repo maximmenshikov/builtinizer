@@ -7,9 +7,31 @@
 class Tokenizer
 {
 public:
-    static std::string getToken(std::stringstream &ss,
-                                TokenClass &cls,
-                                TokenPosition &tp);
-    static std::string fixupToken(const std::string &s);
-    static void addSpace(std::string &s);
+    /**
+     * Get token from string stream
+     *
+     * @param      stringStream   The string stream to get token from
+     * @param      tokenClass     The class of identified token
+     * @param      tokenPosition  The position of identified token
+     *
+     * @return     The string representation of a token
+     */
+    static std::string getToken(std::stringstream &stringStream,
+                                TokenClass &tokenClass,
+                                TokenPosition &tokenPosition);
+    /**
+     * Fix up type - replace known bad types with known good
+     *
+     * @param      typeName  String representation of type
+     *
+     * @return     Fixed type name
+     */
+    static std::string fixupType(const std::string &typeName);
+
+    /**
+     * Add a space after string if there are none of them.
+     *
+     * @param      str   String object
+     */
+    static void addSpace(std::string &str);
 };
