@@ -9,6 +9,21 @@
 #include "TokenPosition.hpp"
 #include "Tokenizer.hpp"
 
+struct Options
+{
+    Options()
+    {
+        ignoreHalf = false;
+        constExpr = false;
+        constExprMath = false;
+        mode = BuiltinizerMode::Signatures;
+    }
+
+    bool            ignoreHalf;
+    bool            constExpr;
+    bool            constExprMath;
+    BuiltinizerMode mode;
+};
 
 #define BUILTIN(ID, TYPE, ATTRS) LibraryFunction(#ID, TYPE, ATTRS),
 
@@ -112,25 +127,22 @@ reconstructSignature(LibraryFunction *func)
 int
 main(int argc, const char *argv[])
 {
-    std::string     s;
-    size_t          sigs = 0;
-    bool            ignoreHalf = false;
-    bool            constExpr = false;
-    bool            constExprMath = false;
-    BuiltinizerMode mode = BuiltinizerMode::Signatures;
+    std::string s;
+    size_t      sigs = 0;
+    Options     opts;
 
     for (int i = 1; i < argc; ++i)
     {
         std::string arg = std::string(argv[i]);
 
         if (arg == "--list")
-            mode = BuiltinizerMode::List;
+            opts.mode = BuiltinizerMode::List;
         else if (arg == "--constexpr")
-            constExpr = true;
+            opts.constExpr = true;
         else if (arg == "--constexpr-math")
-            constExprMath = true;
+            opts.constExprMath = true;
         else if (arg == "--ignore-half")
-            ignoreHalf = true;
+            opts.ignoreHalf = true;
     }
 
     for (int i = 0; i < sizeof(funcs) / sizeof(*funcs); ++i)
@@ -139,17 +151,18 @@ main(int argc, const char *argv[])
         auto sig = reconstructSignature(f);
         bool hasHalf = sig.find("half") != std::string::npos;
 
-        if (!ignoreHalf || !hasHalf)
+        if (!opts.ignoreHalf || !hasHalf)
         {
             bool isConst = f->getAttrs().find("c") != std::string::npos ||
-                (constExprMath && f->getAttrs().find("e") != std::string::npos);
+                (opts.constExprMath &&
+                 f->getAttrs().find("e") != std::string::npos);
 
-            if (!constExpr || isConst)
+            if (!opts.constExpr || isConst)
             {
-                switch (mode)
+                switch (opts.mode)
                 {
                     case BuiltinizerMode::Signatures:
-                        if (constExpr)
+                        if (opts.constExpr)
                             std::cout << "constexpr ";
                         std::cout << sig << std::endl;
                         break;
