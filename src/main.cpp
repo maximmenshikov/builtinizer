@@ -116,6 +116,7 @@ main(int argc, const char *argv[])
     size_t          sigs = 0;
     bool            ignoreHalf = false;
     bool            constExpr = false;
+    bool            constExprMath = false;
     BuiltinizerMode mode = BuiltinizerMode::Signatures;
 
     for (int i = 1; i < argc; ++i)
@@ -126,6 +127,8 @@ main(int argc, const char *argv[])
             mode = BuiltinizerMode::List;
         else if (arg == "--constexpr")
             constExpr = true;
+        else if (arg == "--constexpr-math")
+            constExprMath = true;
         else if (arg == "--ignore-half")
             ignoreHalf = true;
     }
@@ -138,7 +141,8 @@ main(int argc, const char *argv[])
 
         if (!ignoreHalf || !hasHalf)
         {
-            bool isConst = f->getAttrs().find("c") != std::string::npos;
+            bool isConst = f->getAttrs().find("c") != std::string::npos ||
+                (constExprMath && f->getAttrs().find("e") != std::string::npos);
 
             if (!constExpr || isConst)
             {
