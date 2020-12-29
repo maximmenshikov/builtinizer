@@ -1,6 +1,7 @@
 #pragma once
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include "TokenClass.hpp"
 #include "TokenPosition.hpp"
 
@@ -22,11 +23,13 @@ public:
     /**
      * Fix up type - replace known bad types with known good
      *
-     * @param      typeName  String representation of type
+     * @param      typeName      String representation of type
+     * @param      replacements  Additional string replacements
      *
      * @return     Fixed type name
      */
-    static std::string fixupType(const std::string &typeName);
+    static std::string fixupType(const std::string &typeName,
+        const std::unordered_map<std::string, std::string> &replacements);
 
     /**
      * Add a space after string if there are none of them.

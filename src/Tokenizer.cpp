@@ -177,12 +177,19 @@ Tokenizer::getToken(std::stringstream &stringStream,
 }
 
 std::string
-Tokenizer::fixupType(const std::string &s)
+Tokenizer::fixupType(
+    const std::string &                                 s,
+    const std::unordered_map<std::string, std::string> &replacements)
 {
     if (s == "long long double")
         return "__float128";
     if (s == "long long long int")
         return "__int128_t";
+
+    auto it = replacements.find(s);
+    if (it != replacements.end())
+        return (*it).second;
+
     return s;
 }
 
