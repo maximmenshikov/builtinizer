@@ -37,3 +37,5 @@ build
 # Dumped core
 core
 
+# Clang's builtins.def file
+Builtins.def
