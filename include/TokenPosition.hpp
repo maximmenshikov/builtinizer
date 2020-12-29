@@ -7,6 +7,6 @@ enum class TokenPosition
                  e.g. <token> <middle> <after> */
     Middle, /**< Position in the middle of type,
                  e.g. <before> <middle> <after> */
-    After,  /**< Position after middle token,
-                 e.g. <before> <middle> <token> */
+    After, /**< Position after middle token,
+                e.g. <before> <middle> <token> */
 };

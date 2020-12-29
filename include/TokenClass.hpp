@@ -8,8 +8,8 @@
  */
 enum class TokenClass
 {
-    Unknown,        /**< Unknown token */
-    PreModifier,    /**< Type's pre-modifier */
-    Type,           /**< Type token */
-    PostModifier,   /**< Type's post-modifier */
+    Unknown, /**< Unknown token */
+    PreModifier, /**< Type's pre-modifier */
+    Type, /**< Type token */
+    PostModifier, /**< Type's post-modifier */
 };

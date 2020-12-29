@@ -18,8 +18,8 @@ public:
      * @return     The string representation of a token
      */
     static std::string getToken(std::stringstream &stringStream,
-                                TokenClass &tokenClass,
-                                TokenPosition &tokenPosition);
+                                TokenClass &       tokenClass,
+                                TokenPosition &    tokenPosition);
     /**
      * Fix up type - replace known bad types with known good
      *
@@ -28,7 +28,8 @@ public:
      *
      * @return     Fixed type name
      */
-    static std::string fixupType(const std::string &typeName,
+    static std::string fixupType(
+        const std::string &                                 typeName,
         const std::unordered_map<std::string, std::string> &replacements);
 
     /**
