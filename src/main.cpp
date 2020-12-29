@@ -2,6 +2,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 #include "BuiltinizerMode.hpp"
 #include "LibraryFunction.hpp"
@@ -17,12 +18,14 @@ struct Options
         constExpr = false;
         constExprMath = false;
         mode = BuiltinizerMode::Signatures;
+        replacements = std::unordered_map<std::string, std::string>();
     }
 
-    bool            ignoreHalf;
-    bool            constExpr;
-    bool            constExprMath;
-    BuiltinizerMode mode;
+    bool                                         ignoreHalf;
+    bool                                         constExpr;
+    bool                                         constExprMath;
+    BuiltinizerMode                              mode;
+    std::unordered_map<std::string, std::string> replacements;
 };
 
 #define BUILTIN(ID, TYPE, ATTRS) LibraryFunction(#ID, TYPE, ATTRS),
@@ -49,7 +52,7 @@ LibraryFunction funcs[] = {
  * @return     String representation of function signature
  */
 std::string
-reconstructSignature(LibraryFunction *func)
+reconstructSignature(LibraryFunction *func, const Options &opts)
 {
     std::string              signature;
     int                      mode = 0;
@@ -111,13 +114,14 @@ reconstructSignature(LibraryFunction *func)
     /* Rebuild signature */
     if (types.size() > 0)
     {
-        signature += Tokenizer::fixupType(types[0]) + " " + func->getId() + "(";
+        signature += Tokenizer::fixupType(types[0], opts.replacements) + " " +
+            func->getId() + "(";
 
         for (int i = 1; i < types.size(); ++i)
         {
             if (i != 1)
                 signature += ", ";
-            signature += Tokenizer::fixupType(types[i]);
+            signature += Tokenizer::fixupType(types[i], opts.replacements);
         }
         signature += ");";
     }
@@ -136,19 +140,42 @@ main(int argc, const char *argv[])
         std::string arg = std::string(argv[i]);
 
         if (arg == "--list")
+        {
             opts.mode = BuiltinizerMode::List;
+        }
         else if (arg == "--constexpr")
+        {
             opts.constExpr = true;
+        }
         else if (arg == "--constexpr-math")
+        {
             opts.constExprMath = true;
+        }
         else if (arg == "--ignore-half")
+        {
             opts.ignoreHalf = true;
+        }
+        else if (arg == "--replace")
+        {
+            if ((i + 1) < argc)
+            {
+                std::string replacement = std::string(argv[i + 1]);
+                auto        delimPos = replacement.find(':');
+
+                if (delimPos != std::string::npos)
+                {
+                    opts.replacements[replacement.substr(0, delimPos)] =
+                        replacement.substr(delimPos + 1);
+                }
+                ++i;
+            }
+        }
     }
 
     for (int i = 0; i < sizeof(funcs) / sizeof(*funcs); ++i)
     {
         auto f = &funcs[i];
-        auto sig = reconstructSignature(f);
+        auto sig = reconstructSignature(f, opts);
         bool hasHalf = sig.find("half") != std::string::npos;
 
         if (!opts.ignoreHalf || !hasHalf)
