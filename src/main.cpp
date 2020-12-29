@@ -19,6 +19,7 @@ struct Options
         constExprMath = false;
         mode = BuiltinizerMode::Signatures;
         replacements = std::unordered_map<std::string, std::string>();
+        ignoreFunctions = std::unordered_map<std::string, bool>();
     }
 
     bool                                         ignoreHalf;
@@ -26,6 +27,7 @@ struct Options
     bool                                         constExprMath;
     BuiltinizerMode                              mode;
     std::unordered_map<std::string, std::string> replacements;
+    std::unordered_map<std::string, bool>        ignoreFunctions;
 };
 
 #define BUILTIN(ID, TYPE, ATTRS) LibraryFunction(#ID, TYPE, ATTRS),
@@ -170,13 +172,29 @@ main(int argc, const char *argv[])
                 ++i;
             }
         }
+        else if (arg == "--ignore")
+        {
+            if ((i + 1) < argc)
+            {
+                std::string fn = std::string(argv[i + 1]);
+
+                opts.ignoreFunctions[fn] = true;
+                ++i;
+            }
+        }
     }
 
     for (int i = 0; i < sizeof(funcs) / sizeof(*funcs); ++i)
     {
-        auto f = &funcs[i];
-        auto sig = reconstructSignature(f, opts);
-        bool hasHalf = sig.find("half") != std::string::npos;
+        auto        f = &funcs[i];
+        std::string sig;
+        bool        hasHalf;
+
+        if (opts.ignoreFunctions[f->getId()])
+            continue;
+
+        sig = reconstructSignature(f, opts);
+        hasHalf = sig.find("half") != std::string::npos;
 
         if (!opts.ignoreHalf || !hasHalf)
         {
