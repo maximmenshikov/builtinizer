@@ -5,16 +5,21 @@
 set -e
 set -o pipefail
 
+url=https://raw.githubusercontent.com/llvm/llvm-project/main/clang/include/clang/Basic/Builtins.def
+
 top_folder="$(cd "$(dirname "$(which "$0")")"/.. ; pwd -P)"
 . "${top_folder}/scripts/lib.sh"
 
-pushd "${top_folder}/src"
+pushd "${top_folder}/src" > /dev/null
 	# Download Builtins.def
-	wget -q https://raw.githubusercontent.com/llvm/llvm-project/main/clang/include/clang/Basic/Builtins.def -O Builtins.def
-popd
+	wget -q "${url}" -O Builtins.def
+popd > /dev/null
 
-pushd "${top_folder}"
-	./scripts/build.sh
+pushd "${top_folder}" > /dev/null
+	out=$(./scripts/build.sh)
+	if [ "$?" != "0" ] ; then
+		fail "${out}"
+	fi
 	./build/builtinizer --constexpr \
 						--constexpr-math \
 						--ignore-half \
@@ -22,4 +27,4 @@ pushd "${top_folder}"
 						--ignore __builtin___CFStringMakeConstantString \
 						--ignore __builtin___NSStringMakeConstantString \
 						--ignore __builtin_convertvector
-popd
+popd > /dev/null
