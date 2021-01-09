@@ -21,6 +21,7 @@ struct Options
         replacements = std::unordered_map<std::string, std::string>();
         ignoreFunctions = std::unordered_map<std::string, bool>();
         ignoreLibraryFunctions = false;
+        forceFunctions = std::unordered_map<std::string, bool>();
     }
 
     bool                                         ignoreHalf;
@@ -30,6 +31,7 @@ struct Options
     std::unordered_map<std::string, std::string> replacements;
     std::unordered_map<std::string, bool>        ignoreFunctions;
     bool                                         ignoreLibraryFunctions;
+    std::unordered_map<std::string, bool>        forceFunctions;
 };
 
 #define DEF_BUILTIN(ID, TYPE, ATTRS, META_TYPE) \
@@ -194,6 +196,16 @@ main(int argc, const char *argv[])
         {
             opts.ignoreLibraryFunctions = true;
         }
+        else if (arg == "--force")
+        {
+            if ((i + 1) < argc)
+            {
+                std::string fn = std::string(argv[i + 1]);
+
+                opts.forceFunctions[fn] = true;
+                ++i;
+            }
+        }
     }
 
     for (int i = 0; i < sizeof(funcs) / sizeof(*funcs); ++i)
@@ -217,8 +229,10 @@ main(int argc, const char *argv[])
             bool isConst = f->getAttrs().find("c") != std::string::npos ||
                 (opts.constExprMath &&
                  f->getAttrs().find("e") != std::string::npos);
+            bool forced = opts.forceFunctions.find(f->getId()) !=
+                opts.forceFunctions.end();
 
-            if (!opts.constExpr || isConst)
+            if (!opts.constExpr || isConst || forced)
             {
                 switch (opts.mode)
                 {
