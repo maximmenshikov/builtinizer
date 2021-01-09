@@ -6,7 +6,7 @@ set -e
 set -o pipefail
 
 url=https://raw.githubusercontent.com/llvm/llvm-project/main/clang/include/clang/Basic/Builtins.def
-params="--constexpr --constexpr-math --ignore-half
+params="--constexpr --constexpr-math --ignore-half --ignore-lib
         --replace ptrdiff_t:__PTRDIFF_TYPE__
         --ignore __builtin___CFStringMakeConstantString
         --ignore __builtin___NSStringMakeConstantString
