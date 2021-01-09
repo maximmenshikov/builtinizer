@@ -11,7 +11,11 @@ params="--constexpr --constexpr-math --ignore-half --ignore-lib
         --ignore __builtin___CFStringMakeConstantString
         --ignore __builtin___NSStringMakeConstantString
         --ignore __builtin_convertvector
-        --ignore __builtin_addressof"
+        --ignore __builtin_addressof
+        --force __builtin_lgamma
+        --force __builtin_lgammaf
+        --force __builtin_lgammal
+        --force __builtin_lgammaf128"
 params_list="--list"
 out_file="constexpr-builtins.hookdef"
 out_file_list="constexpr-builtins.gcc.compdef"
