@@ -235,14 +235,6 @@ main(int argc, const char *argv[])
                 }
                 sigs++;
             }
-            else
-            {
-                std::cout << sig << " is not const" << std::endl;
-            }
-        }
-        else
-        {
-            std::cout << sig << " has half" << std::endl;
         }
     }
     return 0;
