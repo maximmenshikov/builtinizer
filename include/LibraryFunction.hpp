@@ -1,14 +1,17 @@
 #pragma once
 #include <string>
+#include "MetaType.hpp"
 
 class LibraryFunction
 {
 public:
-    LibraryFunction(const char *id, const char *type, const char *attrs)
+    LibraryFunction(const char *id, const char *type, const char *attrs,
+                    MetaType metaType)
     {
         _id = std::string(id);
         _type = std::string(type);
         _attrs = std::string(attrs);
+        _metaType = metaType;
     }
 
     virtual ~LibraryFunction()
@@ -45,8 +48,18 @@ public:
         return _attrs;
     }
 
+    /**
+     * @brief      Get function meta type
+     *
+     * @return     The function's meta type.
+     */
+    MetaType getMetaType() const
+    {
+        return _metaType;
+    }
 private:
     std::string _id;
     std::string _type;
     std::string _attrs;
+    MetaType _metaType;
 };

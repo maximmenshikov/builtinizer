@@ -20,6 +20,7 @@ struct Options
         mode = BuiltinizerMode::Signatures;
         replacements = std::unordered_map<std::string, std::string>();
         ignoreFunctions = std::unordered_map<std::string, bool>();
+        ignoreLibraryFunctions = false;
     }
 
     bool                                         ignoreHalf;
@@ -28,17 +29,24 @@ struct Options
     BuiltinizerMode                              mode;
     std::unordered_map<std::string, std::string> replacements;
     std::unordered_map<std::string, bool>        ignoreFunctions;
+    bool                                         ignoreLibraryFunctions;
 };
 
-#define BUILTIN(ID, TYPE, ATTRS) LibraryFunction(#ID, TYPE, ATTRS),
+#define DEF_BUILTIN(ID, TYPE, ATTRS, META_TYPE) \
+    LibraryFunction(#ID, TYPE, ATTRS, META_TYPE),
 
+#if defined(DEF_BUILTIN)
+#define BUILTIN(ID, TYPE, ATTRS) \
+    DEF_BUILTIN(ID, TYPE, ATTRS, MetaType::Builtin)
+#endif
 #if defined(BUILTIN) && !defined(LIBBUILTIN)
 #define LIBBUILTIN(ID, TYPE, ATTRS, HEADER, BUILTIN_LANG) \
-    BUILTIN(ID, TYPE, ATTRS)
+    DEF_BUILTIN(ID, TYPE, ATTRS, MetaType::StandardLibrary)
 #endif
 
 #if defined(BUILTIN) && !defined(LANGBUILTIN)
-#define LANGBUILTIN(ID, TYPE, ATTRS, BUILTIN_LANG) BUILTIN(ID, TYPE, ATTRS)
+#define LANGBUILTIN(ID, TYPE, ATTRS, BUILTIN_LANG) \
+    DEF_BUILTIN(ID, TYPE, ATTRS, MetaType::LanguageBuiltin)
 #endif
 
 LibraryFunction funcs[] = {
@@ -182,6 +190,10 @@ main(int argc, const char *argv[])
                 ++i;
             }
         }
+        else if (arg == "--ignore-lib")
+        {
+            opts.ignoreLibraryFunctions = true;
+        }
     }
 
     for (int i = 0; i < sizeof(funcs) / sizeof(*funcs); ++i)
@@ -191,6 +203,10 @@ main(int argc, const char *argv[])
         bool        hasHalf;
 
         if (opts.ignoreFunctions[f->getId()])
+            continue;
+
+        if (opts.ignoreLibraryFunctions &&
+            f->getMetaType() == MetaType::StandardLibrary)
             continue;
 
         sig = reconstructSignature(f, opts);
@@ -219,6 +235,14 @@ main(int argc, const char *argv[])
                 }
                 sigs++;
             }
+            else
+            {
+                std::cout << sig << " is not const" << std::endl;
+            }
+        }
+        else
+        {
+            std::cout << sig << " has half" << std::endl;
         }
     }
     return 0;
